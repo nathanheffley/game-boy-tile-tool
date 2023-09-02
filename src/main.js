@@ -12,13 +12,12 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 278,
+    height: 450,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-
 
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
@@ -35,9 +34,6 @@ const createWindow = () => {
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

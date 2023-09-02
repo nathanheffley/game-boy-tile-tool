@@ -1,6 +1,6 @@
 {
-  "name": "gameboy-tiler",
-  "productName": "gameboy-tiler",
+  "name": "gameboy-tile-tool",
+  "productName": "Gameboy Tile Tool",
   "version": "0.1.0",
   "description": "A tool for creating and laying out Gameboy tiles",
   "main": ".vite/build/main.js",
