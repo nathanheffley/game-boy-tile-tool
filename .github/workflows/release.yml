@@ -14,11 +14,11 @@ jobs:
       with:
         node-version: 18.16
     - name: install dependencies
-      run: npm install
+      run: yarn
     - name: publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: npm run publish --arch=universal
+      run: yarn publish --arch=universal
 
   publish_on_win:
     runs-on: windows-latest
@@ -28,8 +28,8 @@ jobs:
       with:
         node-version: 18.16
     - name: install dependencies
-      run: npm install
+      run: yarn
     - name: publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: npm run publish
+      run: yarn publish
