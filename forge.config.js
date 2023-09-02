@@ -14,7 +14,7 @@ module.exports = {
       name: '@electron-forge/maker-deb',
       config: {
         options: {
-          productName: 'gameboy-tile-tool',
+          executableName: 'Gameboy Tile Tool',
         },
       },
     },
