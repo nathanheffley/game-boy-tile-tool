@@ -1,6 +1,6 @@
-# Gameboy Tile Tool
+# Game Boy Tile Tool
 
-A modern, cross-platform Gameboy tile editor and layout tool for use with GBDK.
+A modern, cross-platform Game Boy tile editor and layout tool for use with GBDK.
 
 ![A platformer tile being edited inside of the tool.](assets/tile-editor.png)
 
