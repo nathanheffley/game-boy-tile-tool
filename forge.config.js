@@ -19,6 +19,17 @@ module.exports = {
       config: {},
     },
   ],
+  publishers: [
+    {
+      name: "@electron-forge/publisher-github",
+      config: {
+        repository: {
+          owner: "nathanheffley",
+          name: "gameboy-tile-tool",
+        },
+      },
+    },
+  ],
   plugins: [
     {
       name: '@electron-forge/plugin-vite',

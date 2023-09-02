@@ -1,7 +1,7 @@
 {
   "name": "gameboy-tile-tool",
   "productName": "Gameboy Tile Tool",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A tool for creating and laying out Gameboy tiles",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -17,21 +17,6 @@
     "email": "nathan@nathanheffley.com"
   },
   "license": "MIT",
-  "config": {
-    "forge": {
-      "publishers": [
-        {
-          "name": "@electron-forge/publisher-github",
-          "config": {
-            "repository": {
-              "owner": "nathanheffley",
-              "name": "gameboy-tile-tool"
-            }
-          }
-        }
-      ]
-    }
-  },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.1",
     "@electron-forge/maker-deb": "^6.4.1",
