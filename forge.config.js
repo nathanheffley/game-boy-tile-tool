@@ -12,7 +12,11 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          productName: 'gameboy-tile-tool',
+        },
+      },
     },
     {
       name: '@electron-forge/maker-rpm',
