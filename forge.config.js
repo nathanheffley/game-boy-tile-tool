@@ -12,11 +12,7 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {
-        options: {
-          executableName: 'Gameboy Tile Tool',
-        },
-      },
+      config: {},
     },
     {
       name: '@electron-forge/maker-rpm',
