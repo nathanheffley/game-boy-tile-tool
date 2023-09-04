@@ -12,21 +12,25 @@ const colors = {
     3: 'bg-[#000]',
 }
 
-const mapWidth = ref(8)
-const mapHeight = ref(8)
+const mapWidth = ref(12)
+const mapHeight = ref(12)
 
-const oldMapWidth = ref(8)
-const oldMapHeight = ref(8)
+const oldMapWidth = ref(12)
+const oldMapHeight = ref(12)
 
 const map = ref([
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ])
 
 const allSprites = ref([
@@ -214,7 +218,7 @@ window.api.receive("spritesLoaded", (data) => {
             <button @click="copyToClipboard" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">Copy to Clipboard</button>
         </div>
         <div class="shrink-0 w-[333px] flex flex-col gap-4">
-            <div @mouseleave="() => mouseDown = false" class="w-full h-[333px] grid gap-px bg-gray-200 border-2 border-gray-200 select-none" :style="`grid-template-rows: repeat(${mapHeight}, 24px); grid-template-columns: repeat(${mapWidth}, 24px);`">
+            <div @mouseleave="() => mouseDown = false" class="w-full h-[333px] overflow-scroll grid gap-px bg-gray-200 border-2 border-gray-200 select-none" :style="`grid-template-rows: repeat(${mapHeight}, 24px); grid-template-columns: repeat(${mapWidth}, 24px);`">
                 <div v-for="i in mapWidth * mapHeight" @mousedown="() => {colorMap(i-1); mouseDown = true}" @mouseup="() => mouseDown = false" @mouseover="() => mouseDown && colorMap(i-1)">
                     <div class="w-6 h-6 grid grid-rows-[repeat(8,_3px)] grid-cols-[repeat(8,_3px)]">
                         <div v-for="p in 64" :class="colors[allSprites[map[i-1] ?? 0][p-1]]"></div>
