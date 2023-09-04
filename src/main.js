@@ -73,6 +73,9 @@ ipcMain.on("loadFile", (event, args) => {
 
     let name = 'Tileset'
     let sprites = []
+    let map = []
+    let mapWidth = 20
+    let mapHeight = 18
 
     const chunks = data.toString().split('unsigned char ').filter(chunk => chunk.length > 0)
 
@@ -80,58 +83,78 @@ ipcMain.on("loadFile", (event, args) => {
       const dataStrings = chunk.toString()
         .split('\n')
         .map(line => line.trim())
-      
+
       const foundName = dataStrings[0].split('[')[0]
 
-      if (foundName.slice(-5) !== 'Tiles') {
-        console.log('Not tiles!')
-        return
+      if (foundName.slice(-5) === 'Tiles') {
+        sprites = loadSprites(dataStrings)
+        name = foundName.slice(0, -5)
       }
 
-      name = foundName
-
-      sprites = dataStrings.filter(line => line[0] === '0')
-        .flatMap(line => line.split(','))
-        .filter(pixel => pixel.length > 0)
-        .map(pixel => parseInt(pixel, 16))
-        .map(pixel => pixel.toString(2).padStart(8, '0'))
-        .reduce((acc, currentPixel, currentIndex, pixels) => {
-          if (currentIndex % 2 === 0) {
-            acc.push([currentPixel, pixels[currentIndex + 1]])
-          }
-          return acc
-        }, [])
-        .map(([lsbits, msbits]) => {
-          const pixels = []
-          for (let i = 0; i < 8; i++) {
-            const lsb = lsbits[i]
-            const msb = msbits[i]
-            if (lsb === '1' && msb === '1') {
-              pixels.push(3)
-            } else if (lsb === '1') {
-              pixels.push(1)
-            } else if (msb === '1') {
-              pixels.push(2)
-            } else {
-              pixels.push(0)
-            }
-          }
-          return pixels
-        })
-        .reduce((acc, currentPixel, currentIndex, pixels) => {
-          if (currentIndex % 8 === 0) {
-            acc.push([currentPixel, pixels[currentIndex + 1], pixels[currentIndex + 2], pixels[currentIndex + 3], pixels[currentIndex + 4], pixels[currentIndex + 5], pixels[currentIndex + 6], pixels[currentIndex + 7]])
-          }
-          return acc
-        }, [])
-        .map(([p1, p2, p3, p4, p5, p6, p7, p8]) => {
-          return [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8]
-        })
+      if (foundName.slice(-3) === 'Map') {
+        [map, mapWidth, mapHeight] = loadMap(dataStrings)
+      }
     })
 
     mainWindow.webContents.send("spritesLoaded", {
       name,
       sprites,
+      map,
+      mapWidth,
+      mapHeight,
     });
   });
 });
+
+const loadSprites = (dataStrings) => {
+  return dataStrings.filter(line => line[0] === '0')
+    .flatMap(line => line.split(','))
+    .filter(pixel => pixel.length > 0)
+    .map(pixel => parseInt(pixel, 16))
+    .map(pixel => pixel.toString(2).padStart(8, '0'))
+    .reduce((acc, currentPixel, currentIndex, pixels) => {
+      if (currentIndex % 2 === 0) {
+        acc.push([currentPixel, pixels[currentIndex + 1]])
+      }
+      return acc
+    }, [])
+    .map(([lsbits, msbits]) => {
+      const pixels = []
+      for (let i = 0; i < 8; i++) {
+        const lsb = lsbits[i]
+        const msb = msbits[i]
+        if (lsb === '1' && msb === '1') {
+          pixels.push(3)
+        } else if (lsb === '1') {
+          pixels.push(1)
+        } else if (msb === '1') {
+          pixels.push(2)
+        } else {
+          pixels.push(0)
+        }
+      }
+      return pixels
+    })
+    .reduce((acc, currentPixel, currentIndex, pixels) => {
+      if (currentIndex % 8 === 0) {
+        acc.push([currentPixel, pixels[currentIndex + 1], pixels[currentIndex + 2], pixels[currentIndex + 3], pixels[currentIndex + 4], pixels[currentIndex + 5], pixels[currentIndex + 6], pixels[currentIndex + 7]])
+      }
+      return acc
+    }, [])
+    .map(([p1, p2, p3, p4, p5, p6, p7, p8]) => {
+      return [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8]
+    })
+}
+
+const loadMap = (dataStrings) => {
+  const mapLines = dataStrings.filter(line => line[0] === '0')
+
+  const mapWidth = mapLines[0].split(',').filter(tile => tile.length > 0).length
+  const mapHeight = mapLines.length
+
+  const map = mapLines.flatMap(line => line.split(','))
+    .filter(tile => tile.length > 0)
+    .map(tile => parseInt(tile, 16))
+
+  return [map, mapWidth, mapHeight]
+}

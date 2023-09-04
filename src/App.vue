@@ -154,7 +154,7 @@ const copyToClipboard = () => {
     output += '\n};\n\nunsigned char ' + tilesetName.value + 'Map[] =\n{\n    '
 
     for (let i = 0; i < map.value.length; i++) {
-        if (i % 8 === 0 && i !== 0) {
+        if (i % mapWidth.value === 0 && i !== 0) {
             output += '\n    '
         }
         const hex = map.value[i].toString(16).toUpperCase()
@@ -179,6 +179,20 @@ window.api.receive("spritesLoaded", (data) => {
 
     if (data.name) {
         tilesetName.value = data.name
+    }
+
+    if (data.mapWidth) {
+        mapWidth.value = data.mapWidth
+        oldMapWidth.value = data.mapWidth
+    }
+
+    if (data.mapHeight) {
+        mapHeight.value = data.mapHeight
+        oldMapHeight.value = data.mapHeight
+    }
+
+    if (data.map) {
+        map.value = data.map
     }
 });
 </script>
