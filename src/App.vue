@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 const tilesetName = ref('Tileset')
 
+const tool = ref('pencil')
+
 const color  = ref(0)
 
 const colors = {
@@ -62,12 +64,66 @@ const addSprite = () => {
     sprite.value = allSprites.value.length - 1
 }
 
+const fillPixel = (index, oldColor, newColor) => {
+    if (allSprites.value[sprite.value][index] === oldColor) {
+        allSprites.value[sprite.value][index] = color.value
+        if (index % 8 !== 0) {
+            fillPixel(index - 1, oldColor)
+        }
+        if (index % 8 !== 7) {
+            fillPixel(index + 1, oldColor)
+        }
+        if (index > 7) {
+            fillPixel(index - 8, oldColor)
+        }
+        if (index < 56) {
+            fillPixel(index + 8, oldColor)
+        }
+    }
+}
+
 const colorPixel = (index) => {
-    allSprites.value[sprite.value][index] = color.value
+    if (tool.value === 'pencil') {
+        allSprites.value[sprite.value][index] = color.value
+    }
+
+    if (tool.value === 'fill') {
+        const oldColor = allSprites.value[sprite.value][index]
+        if (oldColor !== color.value) {
+            fillPixel(index, oldColor)
+        }
+    }
+}
+
+const fillMap = (index, oldTile) => {
+    if (map.value[index] === oldTile) {
+        map.value[index] = sprite.value
+        if (index % mapWidth.value !== 0) {
+            fillMap(index - 1, oldTile)
+        }
+        if (index % mapWidth.value !== mapWidth.value - 1) {
+            fillMap(index + 1, oldTile)
+        }
+        if (index > mapWidth.value - 1) {
+            fillMap(index - mapWidth.value, oldTile)
+        }
+        if (index < mapWidth.value * (mapHeight.value - 1)) {
+            fillMap(index + mapWidth.value, oldTile)
+        }
+    }
 }
 
 const colorMap = (index) => {
-    map.value[index] = sprite.value
+    if (tool.value === 'pencil') {
+        map.value[index] = sprite.value
+    }
+
+    if (tool.value === 'fill') {
+        const oldTile = map.value[index]
+        if (oldTile !== sprite.value) {
+            fillMap(index, oldTile)
+        }
+    }
 }
 
 const adjustMap = () => {
@@ -202,7 +258,13 @@ window.api.receive("spritesLoaded", (data) => {
         <div class="w-[268px] flex flex-col items-start gap-4">
             <div class="flex gap-2">
                 <div @mouseleave="() => mouseDown = false" class="w-[203px] h-[203px] grid grid-rows-[repeat(8,_24px)] grid-cols-[repeat(8,_24px)] bg-gray-200 border-2 border-gray-200 gap-px select-none">
-                    <div v-for="i in 64" :class="colors[allSprites[sprite][i-1]]" @mousedown="() => {colorPixel(i-1); mouseDown = true}" @mouseup="() => mouseDown = false" @mouseover="() => mouseDown && colorPixel(i-1)"></div>
+                    <div
+                        v-for="i in 64"
+                        :class="colors[allSprites[sprite][i-1]]"
+                        @mousedown="() => {colorPixel(i-1); mouseDown = true}"
+                        @mouseup="() => mouseDown = false"
+                        @mouseover="() => mouseDown && colorPixel(i-1)"
+                    ></div>
                 </div>
 
                 <div class="max-h-[203px] overflow-y-scroll flex flex-col gap-2 items-end">
@@ -220,11 +282,25 @@ window.api.receive("spritesLoaded", (data) => {
                 </div>
             </div>
 
-            <div class="flex border-4 border-gray-200 bg-gray-200">
-                <div @click="color = 0" :class="[color === 0 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center', colors[0]]">0</div>
-                <div @click="color = 1" :class="[color === 1 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center', colors[1]]">1</div>
-                <div @click="color = 2" :class="[color === 2 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center text-white', colors[2]]">2</div>
-                <div @click="color = 3" :class="[color === 3 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center text-white', colors[3]]">3</div>
+            <div class="flex items-center">
+                <div class="flex border-4 border-gray-200 bg-gray-200">
+                    <div @click="color = 0" :class="[color === 0 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center', colors[0]]">0</div>
+                    <div @click="color = 1" :class="[color === 1 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center', colors[1]]">1</div>
+                    <div @click="color = 2" :class="[color === 2 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center text-white', colors[2]]">2</div>
+                    <div @click="color = 3" :class="[color === 3 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center text-white', colors[3]]">3</div>
+                </div>
+
+                <button @click="tool='pencil'" :class="['ml-2 p-1', tool === 'pencil' ? 'text-blue-700 bg-blue-100 rounded' : 'text-gray-700']">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor" class="w-5 h-5">
+                        <path d="M339.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L568.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S517.7-4.4 499.1 9.6L262.4 187.2c-24 18-38.2 46.1-38.4 76.1L339.3 367.1zm-19.6 25.4l-116-104.4C143.9 290.3 96 339.6 96 400c0 3.9 .2 7.8 .6 11.6C98.4 429.1 86.4 448 68.8 448H64c-17.7 0-32 14.3-32 32s14.3 32 32 32H208c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/>
+                    </svg>
+                </button>
+
+                <button @click="tool = 'fill'" :class="['ml-1 p-1', tool === 'fill' ? 'text-blue-700 bg-blue-100 rounded' : 'text-gray-700']">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor" class="w-5 h-5">
+                        <path d="M41.4 9.4C53.9-3.1 74.1-3.1 86.6 9.4L168 90.7l53.1-53.1c28.1-28.1 73.7-28.1 101.8 0L474.3 189.1c28.1 28.1 28.1 73.7 0 101.8L283.9 481.4c-37.5 37.5-98.3 37.5-135.8 0L30.6 363.9c-37.5-37.5-37.5-98.3 0-135.8L122.7 136 41.4 54.6c-12.5-12.5-12.5-32.8 0-45.3zm176 221.3L168 181.3 75.9 273.4c-4.2 4.2-7 9.3-8.4 14.6H386.7l42.3-42.3c3.1-3.1 3.1-8.2 0-11.3L277.7 82.9c-3.1-3.1-8.2-3.1-11.3 0L213.3 136l49.4 49.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0zM512 512c-35.3 0-64-28.7-64-64c0-25.2 32.6-79.6 51.2-108.7c6-9.4 19.5-9.4 25.5 0C543.4 368.4 576 422.8 576 448c0 35.3-28.7 64-64 64z"/>
+                    </svg>
+                </button>
             </div>
 
             <input v-model="tilesetName" class="w-full bg-gray-200 border border-gray-200 px-4 py-2 rounded" placeholder="Tileset Name" />
