@@ -6,6 +6,8 @@ const tilesetName = ref('Tileset')
 
 const tool = ref('pencil')
 
+const palette = ref('bw')
+
 const color  = ref(0)
 
 const colors = {
@@ -227,16 +229,18 @@ const mouseDown = ref(false)
 
 window.api.receive("togglePalette", () => {
     const r = document.querySelector(':root')
-    if (r.style.getPropertyValue('--color-lightest') === '224 248 208') {
-        r.style.setProperty('--color-lightest', '255 255 255')
-        r.style.setProperty('--color-light', '204 204 204')
-        r.style.setProperty('--color-dark', '85 85 85')
-        r.style.setProperty('--color-darkest', '0 0 0')
-    } else {
+    if (palette.value === 'bw') {
+        palette.value = 'dmg'
         r.style.setProperty('--color-lightest', '224 248 208')
         r.style.setProperty('--color-light', '136 192 112')
         r.style.setProperty('--color-dark', '52 104 86')
         r.style.setProperty('--color-darkest', '8 24 32')
+    } else {
+        palette.value = 'bw'
+        r.style.setProperty('--color-lightest', '255 255 255')
+        r.style.setProperty('--color-light', '204 204 204')
+        r.style.setProperty('--color-dark', '85 85 85')
+        r.style.setProperty('--color-darkest', '0 0 0')
     }
 })
 
@@ -270,7 +274,7 @@ window.api.receive("spritesLoaded", (data) => {
 </script>
 
 <template>
-    <div class="p-4 flex gap-4">
+    <div class="p-4 flex gap-4" :key="palette">
         <div class="w-[268px] flex flex-col items-start gap-4">
             <div class="flex gap-2">
                 <div @mouseleave="() => mouseDown = false" class="w-[203px] h-[203px] grid grid-rows-[repeat(8,_24px)] grid-cols-[repeat(8,_24px)] bg-gray-200 border-2 border-gray-200 gap-px select-none">
