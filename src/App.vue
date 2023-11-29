@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import SpriteRender from './SpriteRender.vue';
 
 const tilesetName = ref('Tileset')
 
@@ -8,10 +9,10 @@ const tool = ref('pencil')
 const color  = ref(0)
 
 const colors = {
-    0: 'bg-[#FFF]',
-    1: 'bg-[#CCC]',
-    2: 'bg-[#555]',
-    3: 'bg-[#000]',
+    0: 'bg-lightest',
+    1: 'bg-light',
+    2: 'bg-dark',
+    3: 'bg-darkest',
 }
 
 const mapWidth = ref(12)
@@ -224,6 +225,21 @@ const copyToClipboard = () => {
 
 const mouseDown = ref(false)
 
+window.api.receive("togglePalette", () => {
+    const r = document.querySelector(':root')
+    if (r.style.getPropertyValue('--color-lightest') === '224 248 208') {
+        r.style.setProperty('--color-lightest', '255 255 255')
+        r.style.setProperty('--color-light', '204 204 204')
+        r.style.setProperty('--color-dark', '85 85 85')
+        r.style.setProperty('--color-darkest', '0 0 0')
+    } else {
+        r.style.setProperty('--color-lightest', '224 248 208')
+        r.style.setProperty('--color-light', '136 192 112')
+        r.style.setProperty('--color-dark', '52 104 86')
+        r.style.setProperty('--color-darkest', '8 24 32')
+    }
+})
+
 window.api.receive("spritesLoaded", (data) => {
     allSprites.value = []
     if (data.sprites.length === 0) {
@@ -270,9 +286,9 @@ window.api.receive("spritesLoaded", (data) => {
                 <div class="max-h-[203px] overflow-y-scroll flex flex-col gap-2 items-end">
                     <div v-for="(s, index) in allSprites" class="flex items-center">
                         <span>{{ index }}</span>
-                        <div class="ml-1 border-2 border-gray-200">
-                            <div @click="sprite = index" class="w-6 h-6 grid grid-rows-[repeat(8,_3px)] grid-cols-[repeat(8,_3px)]">
-                                <div v-for="i in 64" :class="colors[s[i-1]]"></div>
+                        <div :class="['ml-1 border-2', index === sprite ? 'border-blue-500' : 'border-gray-200']">
+                            <div @click="sprite = index">
+                                <SpriteRender :sprite="s" />
                             </div>
                         </div>
                     </div>
@@ -284,10 +300,10 @@ window.api.receive("spritesLoaded", (data) => {
 
             <div class="flex items-center">
                 <div class="flex border-4 border-gray-200 bg-gray-200">
-                    <div @click="color = 0" :class="[color === 0 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center', colors[0]]">0</div>
-                    <div @click="color = 1" :class="[color === 1 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center', colors[1]]">1</div>
-                    <div @click="color = 2" :class="[color === 2 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center text-white', colors[2]]">2</div>
-                    <div @click="color = 3" :class="[color === 3 ? 'w-10 h-10 m-1' : 'w-12 h-12', 'flex items-center justify-center text-white', colors[3]]">3</div>
+                    <div @click="color = 0" :class="[color === 0 ? 'border-4 border-blue-500' : '', 'w-12 h-12 flex items-center justify-center', colors[0]]">0</div>
+                    <div @click="color = 1" :class="[color === 1 ? 'border-4 border-blue-500' : '', 'w-12 h-12 flex items-center justify-center', colors[1]]">1</div>
+                    <div @click="color = 2" :class="[color === 2 ? 'border-4 border-blue-500' : '', 'w-12 h-12 flex items-center justify-center text-white', colors[2]]">2</div>
+                    <div @click="color = 3" :class="[color === 3 ? 'border-4 border-blue-500' : '', 'w-12 h-12 flex items-center justify-center text-white', colors[3]]">3</div>
                 </div>
 
                 <button @click="tool='pencil'" :class="['ml-2 p-1', tool === 'pencil' ? 'text-blue-700 bg-blue-100 rounded' : 'text-gray-700']">
@@ -310,9 +326,7 @@ window.api.receive("spritesLoaded", (data) => {
         <div class="shrink-0 w-[333px] flex flex-col gap-4">
             <div @mouseleave="() => mouseDown = false" class="w-full h-[333px] overflow-scroll grid gap-px bg-gray-200 border-2 border-gray-200 select-none" :style="`grid-template-rows: repeat(${mapHeight}, 24px); grid-template-columns: repeat(${mapWidth}, 24px);`">
                 <div v-for="i in mapWidth * mapHeight" @mousedown="() => {colorMap(i-1); mouseDown = true}" @mouseup="() => mouseDown = false" @mouseover="() => mouseDown && colorMap(i-1)">
-                    <div class="w-6 h-6 grid grid-rows-[repeat(8,_3px)] grid-cols-[repeat(8,_3px)]">
-                        <div v-for="p in 64" :class="colors[allSprites[map[i-1] ?? 0][p-1]]"></div>
-                    </div>
+                    <SpriteRender :sprite="allSprites[map[i-1] ?? 0]" />
                 </div>
             </div>
 

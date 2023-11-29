@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, session } = require('electron');
+const { app, BrowserWindow, ipcMain, session, Menu, MenuItem } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -36,6 +36,29 @@ const createWindow = () => {
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
+
+  const template = [
+    { role: 'appMenu' },
+    {
+      label: 'Options',
+      submenu: [
+        {
+          label: 'Toggle Palette',
+          click: () => {
+            mainWindow.webContents.send("togglePalette", {});
+          },
+        },
+      ],
+    },
+    { role: 'fileMenu' },
+    // { role: 'editMenu' }
+    { role: 'viewMenu' },
+    { role: 'windowMenu' },
+    { role: 'help' },
+  ]
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 
 };
 
