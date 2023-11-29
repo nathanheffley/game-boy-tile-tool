@@ -136,9 +136,7 @@ const adjustMap = () => {
     if (mapHeight.value > oldMapHeight.value) {
         // Add rows to bottom
         const valuesToAppend = (mapHeight.value - oldMapHeight.value) * mapWidth.value
-        for (let i = 0; i < valuesToAppend; i++) {
-            newMap.push(0)
-        }
+        newMap.push(...Array(valuesToAppend).fill(0))
     } else if (mapHeight.value < oldMapHeight.value) {
         // Remove rows from bottom
         const valuesToRemove = (oldMapHeight.value - mapHeight.value) * mapWidth.value
@@ -335,9 +333,7 @@ window.api.receive("spritesLoaded", (data) => {
                 :mapHeight="mapHeight"
                 :sprites="allSprites"
 
-                @paint="(index) => {colorMap(index); mouseDown = true}"
-                @mouseleave="() => mouseDown = false"
-                @mouseup="() => mouseDown = false"
+                @paint="colorMap"
             />
 
             <div class="flex">
