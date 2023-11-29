@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import SpriteRender from './SpriteRender.vue';
+import MapRender from './MapRender.vue';
 
 const tilesetName = ref('Tileset')
 
@@ -328,11 +329,16 @@ window.api.receive("spritesLoaded", (data) => {
             <button @click="copyToClipboard" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">Copy to Clipboard</button>
         </div>
         <div class="shrink-0 w-[333px] flex flex-col gap-4">
-            <div @mouseleave="() => mouseDown = false" class="w-full h-[333px] overflow-scroll grid gap-px bg-gray-200 border-2 border-gray-200 select-none" :style="`grid-template-rows: repeat(${mapHeight}, 24px); grid-template-columns: repeat(${mapWidth}, 24px);`">
-                <div v-for="i in mapWidth * mapHeight" @mousedown="() => {colorMap(i-1); mouseDown = true}" @mouseup="() => mouseDown = false" @mouseover="() => mouseDown && colorMap(i-1)">
-                    <SpriteRender :sprite="allSprites[map[i-1] ?? 0]" />
-                </div>
-            </div>
+            <MapRender
+                :map="map"
+                :mapWidth="mapWidth"
+                :mapHeight="mapHeight"
+                :sprites="allSprites"
+
+                @paint="(index) => {colorMap(index); mouseDown = true}"
+                @mouseleave="() => mouseDown = false"
+                @mouseup="() => mouseDown = false"
+            />
 
             <div class="flex">
                 Width: <input type="number" class="ml-1 mr-4 w-16" v-model="mapWidth" @change="adjustMap" />
